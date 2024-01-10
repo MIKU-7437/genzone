@@ -1,0 +1,8 @@
+gen_zone/db.sqlite3
+gen_zone/media
+gen_zone/staticfiles
+Dockerfile
+docker-compose.yml
+.env/
+env/
+venv/
