@@ -230,9 +230,8 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    'https://inquisitive-creature-production.up.railway.app',
-    'https://inquisitive-creature-production.up.railway.app',
-    'https://inquisitive-creature-development.up.railway.app',
+    'https://genzone.up.railway.app/',
+    'http://genzone.up.railway.app/',
     'http://localhost:5173',
     'https://localhost:5173',
 ]
@@ -240,8 +239,8 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://inquisitive-creature-production.up.railway.app',
-    'https://inquisitive-creature-development.up.railway.app',
+    'https://genzone.up.railway.app/',
+    'http://genzone.up.railway.app/',
     'http://localhost:5173',
     'https://localhost:5173',
     'https://probable-sole-crucial.ngrok-free.app',
