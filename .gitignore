@@ -6,3 +6,4 @@ docker-compose.yml
 .env/
 env/
 venv/
+gen_zone/requirements.txt
