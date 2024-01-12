@@ -1,1 +1,1 @@
-web: sh -c 'cd gen_zone && python manage.py migrate && python manage.py collectstatic --noinput && pip install -r requirements.txt && DJANGO_SETTINGS_MODULE=gen_zone.settings uvicorn --host 0.0.0.0 --port 8000 --wsproto=websockets gen_zone.asgi:application'
+web: sh -c 'cd gen_zone && python manage.py migrate && python manage.py collectstatic --noinput && pip install -r requirements.txt && DJANGO_SETTINGS_MODULE=gen_zone.settings uvicorn --host 0.0.0.0 --port 8000 --ws gen_zone.asgi:application'
