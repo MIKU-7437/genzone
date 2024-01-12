@@ -48,13 +48,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'daphne',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
     'channels',
     'channels_redis',
-    'daphne',
+
 
     'users',
     'courses',
