@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-
+from django.shortcuts import get_object_or_404
+from .permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.http import Http404
@@ -200,15 +201,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 #Testing logic
 class UserDetailView(APIView):
 
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     authentication_classes = [JWTAuthentication]
     serializer_class = UserSerializer
 
     def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
+        id = self.kwargs.get('pk')
+        user = get_object_or_404(User, id=id)
+        return user
     # Функция которая будет срабатывать только на GET-запросы(возващает только один аккаунт)
-    def get(self, request):
+    def get(self, request, pk):
         """
         Логика для работы с аккаунтом (нужно предоставить access токен):
 
@@ -224,7 +226,7 @@ class UserDetailView(APIView):
         return Response(serializer.data)
 
     # Функция которая будет срабатывать только на PUT-запросы(обновить данные и пользователе)
-    def put(self, request):
+    def put(self, request, pk):
         """
         Описание: Обновляет данные аутентифицированного пользователя.
         Параметры которые можно редактировать:
@@ -234,13 +236,12 @@ class UserDetailView(APIView):
         username: полное имя пользователя, состоит из first_name и last_name
         Ответ: Обновленные данные пользователя.
         """
-        # Получение объекта пользователя по email
         user = self.get_object()
 
         # Проверка, что пользователь обновляет самого себя
-        if user != request.user:
-            return Response({'error': 'You do not have permission to update this user.'}, status=status.HTTP_403_FORBIDDEN)
-
+        # if user != request.user:
+        #     return Response({'error': 'You do not have permission to update this user.'}, status=status.HTTP_403_FORBIDDEN)
+        self.check_object_permissions(self.request, user)
         # Сериализация и обновление данных пользователя
         serializer = UserSerializer(user, data=request.data, context={"request": request})
         if serializer.is_valid():
@@ -250,17 +251,13 @@ class UserDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     #TESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST
-    def delete(self, request,format=None):
+    def delete(self, request, pk, format=None):
         """
         Описание: Удаляет аутентифицированного пользователя.
-        Ответ: Сообщение об успешном удалении.
+        Ответ: Сообщение об успешном удалении.z
         """
         # Получение объекта пользователя
         user = self.get_object()
-
-        # Проверка, что пользователь удаляет самого себя
-        if user != request.user:
-            return Response({'error': 'You do not have permission to delete this user.'}, status=status.HTTP_403_FORBIDDEN)
 
         # Удаление пользователя
         email = user.email

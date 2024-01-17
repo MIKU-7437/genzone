@@ -19,7 +19,7 @@ urlpatterns = [
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('list/', views.AllUsersView.as_view(), name='account-list'),
     # Получение, обновление и удаление данных аккаунта пользователя по email
-    path('', views.UserDetailView.as_view(), name='account-detail'),
+    path('<int:pk>/', views.UserDetailView.as_view(), name='account-detail'),
 
     path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
 ]
