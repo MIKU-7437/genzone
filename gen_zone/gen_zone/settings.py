@@ -145,7 +145,7 @@ CHANNEL_LAYERS = {
 #     }
 # }
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=7),
 }
 DATABASES = {
     'default': {

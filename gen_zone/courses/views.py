@@ -1,14 +1,18 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, generics, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
-from django.http import Http404
 from django.shortcuts import get_object_or_404
-from .models import Course, Module, Lesson, Step, Content
-from .serializers import CourseSerializer, LessonSerializer, ModuleSerializer, StepSerializer, ContentSerializer
-from .permissions import IsOwnerOrReadOnly, HasCourse
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from .models import Course, Module, Lesson, Step, Content
+from .permissions import IsOwnerOrReadOnly
+from .serializers import (
+    CourseSerializer,
+    LessonSerializer,
+    ModuleSerializer,
+    StepSerializer,
+    ContentSerializer
+)
         
 
 class CourseListCreateView(generics.ListCreateAPIView):
@@ -37,7 +41,8 @@ class CourseListCreateView(generics.ListCreateAPIView):
         if request.user.is_authenticated:
             serializer = CourseSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(owner=request.user)
+                course = serializer.save(owner=request.user)
+                request.user.courses_owned.add(course)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -56,23 +61,37 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         if course not in user.courses.all():
             user.courses.add(course)
-            return Response({"success": f"Course {course.title} added to user {user.email}"},
-                            status=status.HTTP_200_OK)
+            return Response({"success": f"Курс {course.title} добавлен пользователю {user.email}"},
+                        status=status.HTTP_200_OK)
         else:
-            return Response({"error": f"User {user.email} already has access to course {course.title}"},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Пользователь {user.email} уже имеет доступ к курсу {course.title}"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(detail=True, methods=['get'])
-    def remove_course(self, request, id=None):
+    def add_favorite_course(self, request, id=None):
         course = self.get_object()
         user = request.user
 
-        if course in user.courses.all():
-            user.courses.remove(course)
-            return Response({"success": f"Course {course.title} removed from user {user.email}"},
+        if course not in user.courses_favorite.all():
+            user.courses_favorite.add(course)
+            return Response({"success": f"Course {course.title} added to favorites for user {user.email}"},
                             status=status.HTTP_200_OK)
         else:
-            return Response({"error": f"User {user.email} does not have access to course {course.title}"},
+            return Response({"error": f"Course {course.title} is already in favorites for user {user.email}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def remove_favorite_course(self, request, id=None):
+        course = self.get_object()
+        user = request.user
+
+        if course in user.courses_favorite.all():
+            user.courses_favorite.remove(course)
+            return Response({"success": f"Course {course.title} removed from favorites for user {user.email}"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": f"Course {course.title} is not in favorites for user {user.email}"},
                             status=status.HTTP_400_BAD_REQUEST)
 
     def get_course(self, id):
@@ -99,7 +118,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         course.delete()
 
-        return Response({"success": "Course successfully deleted"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": "Курс успешно удален"}, status=status.HTTP_204_NO_CONTENT)
 
 class ModuleCreateView(generics.CreateAPIView):
     """
@@ -206,7 +225,6 @@ class ModuleDetailView(generics.RetrieveUpdateDestroyAPIView):
         course = get_object_or_404(Course, id=module.course.id)
 
         module.delete()
-        #атомарные транзакции ACID
         modules_to_update = course.modules.filter(module_num__gt=module_num)
         for mod in modules_to_update:
             mod.module_num -= 1
@@ -434,5 +452,3 @@ class StepDetailView(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-

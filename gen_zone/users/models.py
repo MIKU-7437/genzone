@@ -38,7 +38,8 @@ class User(AbstractUser):
 
     #courses
     courses = models.ManyToManyField('courses.Course', related_name='users', blank=True)
-    
+    courses_owned = models.ManyToManyField('courses.Course', related_name='created_by_user', blank=True)
+    courses_favorite = models.ManyToManyField('courses.Course', related_name='favorite_for_user', blank=True)
     # Фотография пользователя
     photo = models.ImageField(
         upload_to='customer_photos/',

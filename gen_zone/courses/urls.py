@@ -14,4 +14,6 @@ urlpatterns = [
     # Using DRF ViewSet for add/remove course actions
     path('course/<int:id>/add_course/', CourseViewSet.as_view({'get': 'add_course'}), name='add-course'),
     path('course/<int:id>/remove_course/', CourseViewSet.as_view({'get': 'remove_course'}), name='remove-course'),
+    path('course/<int:id>/add_favorite_course/', CourseViewSet.as_view({'get': 'add_favorite_course'}), name='add-favorite-course'),
+    path('course/<int:id>/remove_favorite_course/', CourseViewSet.as_view({'get': 'remove_favorite_course'}),   name='remove-favorite-course'),
 ]
