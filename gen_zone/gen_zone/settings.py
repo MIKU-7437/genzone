@@ -144,9 +144,9 @@ CHANNEL_LAYERS = {
 #         'PORT': '5432',
 #     }
 # }
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=7),
-# }
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=30),
+}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
