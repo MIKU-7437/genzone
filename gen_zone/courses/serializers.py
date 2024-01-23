@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Course, Module, Lesson, Step, Content
-from users.serializers import UserSerializer
+#from users.serializers import UserSerializer
 
 
 # for sidebar
@@ -16,28 +16,27 @@ class SBModuleSerializer(serializers.ModelSerializer):
         model = Module
         fields = ['module_num','module_title' ,'module_description', 'lessons']
 
-class SBCourseSerializer(serializers.ModelSerializer):
-    modules = SBModuleSerializer(many=True, read_only=True)
-    owner = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Course
-        fields = [
-            'id',
-            'title',
-            'description',
-            'owner',
-            'rating',
-            'preview', 
-            'price',
-            'modules'
-        ]
-    def get_preview_url(self, obj):
-        # Здесь создайте URL для изображения, используя его относительный путь
-        if obj.preview:
-            return self.context['request'].build_absolute_uri(obj.preview.url)
-        return None
-    
+# class SBCourseSerializer(serializers.ModelSerializer):
+#     modules = SBModuleSerializer(many=True, read_only=True)
+#     owner = UserSerializer(read_only=True)
+#
+#     class Meta:
+#         model = Course
+#         fields = [
+#             'id',
+#             'title',
+#             'description',
+#             'rating',
+#             'preview',
+#             'price',
+#             'modules'
+#         ]
+#     def get_preview_url(self, obj):
+#         # Здесь создайте URL для изображения, используя его относительный путь
+#         if obj.preview:
+#             return self.context['request'].build_absolute_uri(obj.preview.url)
+#         return None
+#
 
 #usual
 class ContentSerializer(serializers.ModelSerializer):
@@ -140,7 +139,7 @@ class ModuleSerializer(serializers.ModelSerializer):
         return module
 
 class CourseSerializer(serializers.ModelSerializer):
-    owner = UserSerializer(read_only=True)
+    #   owner = UserSerializer(read_only=True)
     modules = SBModuleSerializer(many=True, read_only=True)
 
     class Meta:

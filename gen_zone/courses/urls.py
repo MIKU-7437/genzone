@@ -16,4 +16,6 @@ urlpatterns = [
     path('course/<int:id>/remove_course/', CourseViewSet.as_view({'get': 'remove_course'}), name='remove-course'),
     path('course/<int:id>/add_favorite_course/', CourseViewSet.as_view({'get': 'add_favorite_course'}), name='add-favorite-course'),
     path('course/<int:id>/remove_favorite_course/', CourseViewSet.as_view({'get': 'remove_favorite_course'}),   name='remove-favorite-course'),
+    path('course/<int:id>/add_in_progress_course/', CourseViewSet.as_view({'get': 'add_course_in_progress'}), name='add-favorite-course'),
+    path('course/<int:id>/remove_in_progress_course/', CourseViewSet.as_view({'get': 'remove_course_in_progress'}),   name='remove-favorite-course'),
 ]

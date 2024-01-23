@@ -2,13 +2,30 @@ from rest_framework import serializers
 from .models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from courses.serializers import CourseSerializer
+
 
 class UserSerializer(serializers.ModelSerializer):
-
+    courses = CourseSerializer(many=True, read_only=True)
+    courses_owned = CourseSerializer(many=True, read_only=True)
+    courses_favorite = CourseSerializer(many=True, read_only=True)
+    courses_in_progress = CourseSerializer(many=True, read_only=True)
     class Meta:
         model = User
-        fields = ('id', 'username','first_name', 'last_name', 'email', 'role', 'photo', 'courses', 'courses_owned', 'courses_favorite')
-        read_only_fields = ('email', 'username','role')
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'role',
+            'photo',
+            'courses',
+            'courses_owned',
+            'courses_favorite',
+            'courses_in_progress'
+        )
+        read_only_fields = ('email', 'username', 'role')
 
     # redacting 'username' field depending on 'first_name' and 'last_name'
     def update(self, instance, validated_data):

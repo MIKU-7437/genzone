@@ -43,6 +43,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
             if serializer.is_valid():
                 course = serializer.save(owner=request.user)
                 request.user.courses_owned.add(course)
+                request.user.courses.add(course)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -66,6 +67,45 @@ class CourseViewSet(viewsets.ModelViewSet):
         else:
             return Response({"error": f"Пользователь {user.email} уже имеет доступ к курсу {course.title}"},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def remove_course(self, request, id=None):
+        course = self.get_object()
+        user = request.user
+
+        if course in user.courses.all():
+            user.courses.remove(course)
+            return Response({"success": f"Курс {course.title} удален для пользователя {user.email}"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": f"Курс {course.title} не связан с пользователем {user.email}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def add_course_in_progress(self, request, id=None):
+        course = self.get_object()
+        user = request.user
+
+        if course not in user.courses_in_progress.all():
+            user.courses_in_progress.add(course)
+            return Response({"success": f"Курс {course.title} добавлен в прогресс для пользователя {user.email}"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": f"Курс {course.title} уже в прогрессе у пользователя {user.email}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def remove_course_in_progress(self, request, id=None):
+        course = self.get_object()
+        user = request.user
+
+        if course in user.courses_in_progress.all():
+            user.courses_in_progress.remove(course)
+            return Response({"success": f"Курс {course.title} удален из прогресса для пользователя {user.email}"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": f"Курс {course.title} не в прогрессе у пользователя {user.email}"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
     @action(detail=True, methods=['get'])
